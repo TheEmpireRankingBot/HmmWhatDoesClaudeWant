@@ -6,17 +6,20 @@
 
 import { PaletteBook } from './core/palette.js';
 import { randomSeed } from './core/utils.js';
+import { AudioEngine } from './core/audio.js';
 import { Currents } from './sketches/currents.js';
 import { Murmuration } from './sketches/murmuration.js';
 import { Coral } from './sketches/coral.js';
 import { Heartwood } from './sketches/heartwood.js';
+import { Cosmos } from './sketches/cosmos.js';
 
-const SKETCHES = [Currents, Murmuration, Coral, Heartwood];
+const SKETCHES = [Currents, Murmuration, Coral, Heartwood, Cosmos];
 
 const canvas = document.getElementById('stage');
 const ctx = canvas.getContext('2d', { alpha: false });
 
 const book = new PaletteBook();
+const audio = new AudioEngine();
 
 // ---- Live shell state shared with the active sketch -----------------------
 const env = {
@@ -28,6 +31,8 @@ const env = {
     return book.current;
   },
   pointer: { x: -1, y: -1, px: -1, py: -1, down: false, inside: false, justPressed: false },
+  // The ambient audio engine — sketches may ring an accent via env.audio.ping().
+  audio,
   // Sketches call this after mutating their own params (e.g. presets) so the
   // sliders catch up to the new values.
   refreshControls: () => syncControlInputs(),
@@ -76,6 +81,7 @@ function loop(now) {
   if (active && !paused) {
     active.frame(dt);
   }
+  audio.update(dt);
   // justPressed is a one-frame pulse.
   env.pointer.justPressed = false;
   requestAnimationFrame(loop);
@@ -243,6 +249,38 @@ function togglePause() {
   document.getElementById('btn-pause').textContent = paused ? 'Play' : 'Pause';
 }
 
+// ---- Ambient audio --------------------------------------------------------
+const btnSound = document.getElementById('btn-sound');
+function setSoundButton(on) {
+  btnSound.textContent = on ? 'Sound: on' : 'Sound: off';
+  btnSound.classList.toggle('on', on);
+  if (!audio.available) {
+    btnSound.textContent = 'Sound: n/a';
+    btnSound.disabled = true;
+  }
+}
+async function toggleSound() {
+  // enable() must run inside this user-gesture handler to satisfy autoplay rules.
+  const on = await audio.toggle();
+  setSoundButton(on);
+}
+
+/**
+ * One-tap "sleep / chill" mode: drift among the stars with a calm palette,
+ * soft generative audio, no interface, fullscreen. The click itself is the
+ * gesture that lets audio and fullscreen start.
+ */
+async function sleepMode() {
+  book.setByName('Galaxy');
+  updatePaletteName();
+  selectSketch(Cosmos);
+  audio.setVolume(0.4);
+  await audio.enable();
+  setSoundButton(audio.isOn);
+  if (!document.body.classList.contains('ui-hidden')) toggleUI();
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+}
+
 // ---- Buttons --------------------------------------------------------------
 document.getElementById('btn-pause').addEventListener('click', togglePause);
 document.getElementById('btn-regen').addEventListener('click', regenerate);
@@ -250,6 +288,16 @@ document.getElementById('btn-palette').addEventListener('click', cyclePalette);
 document.getElementById('btn-save').addEventListener('click', savePNG);
 document.getElementById('btn-fullscreen').addEventListener('click', toggleFullscreen);
 document.getElementById('btn-hide').addEventListener('click', toggleUI);
+btnSound.addEventListener('click', toggleSound);
+document.getElementById('btn-sleep').addEventListener('click', sleepMode);
+
+const volInput = document.getElementById('vol');
+const twinkleInput = document.getElementById('twinkle');
+volInput.addEventListener('input', () => audio.setVolume(parseFloat(volInput.value)));
+twinkleInput.addEventListener('input', () => audio.setTwinkle(parseFloat(twinkleInput.value)));
+audio.setVolume(parseFloat(volInput.value));
+audio.setTwinkle(parseFloat(twinkleInput.value));
+setSoundButton(false);
 
 // ---- Keyboard shortcuts ---------------------------------------------------
 window.addEventListener('keydown', (e) => {
@@ -261,10 +309,12 @@ window.addEventListener('keydown', (e) => {
     case 's': savePNG(); break;
     case 'h': toggleUI(); break;
     case 'f': toggleFullscreen(); break;
+    case 'm': toggleSound(); break;
     case '1': selectSketch(SKETCHES[0]); break;
     case '2': selectSketch(SKETCHES[1]); break;
     case '3': selectSketch(SKETCHES[2]); break;
     case '4': selectSketch(SKETCHES[3]); break;
+    case '5': selectSketch(SKETCHES[4]); break;
   }
 });
 

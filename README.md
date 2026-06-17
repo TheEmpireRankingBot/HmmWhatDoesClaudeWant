@@ -1,6 +1,6 @@
 # Living Systems
 
-**A small gallery of emergence — four interactive generative artworks, each built from a handful of simple rules that add up to something that looks alive.**
+**A small gallery of emergence — five interactive generative artworks, each built from a handful of simple rules that add up to something that looks alive — with a generative ambient soundtrack so the whole thing doubles as a companion for sleep and focus.**
 
 No build step, no dependencies, no backend. Pure HTML + CSS + ES-module JavaScript drawn to a `<canvas>`. Open it and play.
 
@@ -16,6 +16,7 @@ No build step, no dependencies, no backend. Pure HTML + CSS + ES-module JavaScri
 | 2 | **Murmuration** | separate · align · cohere | a flock no bird intends |
 | 3 | **Coral** | feed · kill · diffuse | Turing patterns (shells, spots, coral) |
 | 4 | **Heartwood** | a branch splits into branches | a swaying, blossoming tree |
+| 5 | **Cosmos** | drift · parallax · twinkle | a slow fall through stars and nebula |
 
 ### 1 — Currents
 Thousands of particles ride an invisible vector field defined by **3D simplex noise** (the third axis is time, so the field slowly breathes). Each particle leaves a faint trail; the trails pile up into hair-like currents. The pointer stirs a vortex.
@@ -28,6 +29,21 @@ Reynolds **boids**. Every bird obeys three local rules — keep your distance, m
 
 ### 4 — Heartwood
 A recursive, hand-rolled **L-system** garden. A branch splits into smaller branches, down to twigs that blossom. Two touches make it feel grown rather than drawn: every node has a *birth time* so the tree unfurls trunk-to-tip, and a **noise wind** rotates each branch by an amount that accumulates down the tree — trunks barely stir while the outermost twigs sway. Click the ground to plant another.
+
+### 5 — Cosmos
+A slow drift through deep space, made to be stared into. Three layers: a soft **nebula** baked from fractal noise (and blurred by upscaling), a **parallax starfield** where nearer stars drift and twinkle faster and the pointer gently shifts the field by depth, and **shooting stars** that streak across now and then — each one ringing a soft chime through the audio engine. Click to send one across.
+
+---
+
+## Ambience — a use for all this
+
+The honest reason the gallery exists is to be *looked at* — so it ships with a generative soundtrack that makes it something to **fall asleep to, or focus against**.
+
+Open the **Ambience** panel and hit **Sound** (or press `M`). You'll hear a slow, low **drone pad** breathing under a long reverb, with soft **chimes** drifting in at random — a pentatonic scale, so nothing ever clashes. It never loops and never resolves; it just keeps going. Some sketches add accents (a shooting star in Cosmos rings a chime). Two sliders shape it: **Volume** and **Chimes** (how often the bells fall).
+
+For the full effect, press **Sleep mode**: it drops you into Cosmos with a calm palette, starts the audio softly, hides the interface and goes fullscreen — a dark, drifting, gently-chiming starfield with nothing else on screen. Leave it running by the bed, or on a second monitor while you work.
+
+> Audio only starts on a click/tap/keypress — browsers require a gesture before they'll make sound — so the **Sound** and **Sleep mode** buttons are how you begin.
 
 ---
 
@@ -43,11 +59,12 @@ Each piece has its own sliders in the panel. Shared shortcuts:
 | `S` | save the current frame as a PNG |
 | `H` | hide the interface (clean view / screenshots) |
 | `F` | fullscreen |
-| `1`–`4` | switch between pieces |
+| `M` | toggle ambient sound |
+| `1`–`5` | switch between pieces |
 
 Move or drag the pointer to interact with whatever's on screen.
 
-There are seven palettes (Aurora, Ember, Bloom, Tide, Flora, Mono, Spectral); every piece reads from the same palette, so a colour scheme carries across the whole gallery.
+There are nine palettes (Aurora, Ember, Bloom, Tide, Flora, Mono, Spectral, Galaxy, Nightfall); every piece reads from the same palette, so a colour scheme carries across the whole gallery.
 
 ---
 
@@ -78,12 +95,14 @@ src/
     utils.js          math helpers + a seedable PRNG (mulberry32)
     noise.js          seedable 2D/3D simplex noise (+ fBm)
     palette.js        curated palettes with smooth colour interpolation
+    audio.js          generative ambient audio engine (Web Audio)
     sketch.js         base class: the tiny contract every piece implements
   sketches/
     currents.js       flow field
     murmuration.js    boids + spatial hash
     coral.js          Gray–Scott reaction–diffusion
     heartwood.js      recursive growing garden
+    cosmos.js         drifting nebula + parallax starfield
 ```
 
 Every sketch implements the same small interface — `controls()`, `reset()`, `resize()`, `onParam()`, `frame(dt)` — and the shell treats all four identically. Adding a fifth piece is just another file in `sketches/` and one line in `main.js`. The shell hands each sketch a live `env` (current size, palette, pointer, seed) and a 2D context; the sketch just draws.
@@ -93,6 +112,7 @@ Design notes worth knowing:
 - **Trails** are produced by painting a translucent wash of the background each frame instead of clearing — lower alpha, longer trails.
 - **Device-pixel-ratio aware.** The canvas backing store scales with the display (capped at 2×) so it stays crisp on retina screens, and saved PNGs are full-resolution.
 - **Performance.** Boids use a spatial hash; the reaction–diffusion runs on a capped downscaled grid and is upscaled with smoothing.
+- **Generative audio.** The soundtrack is synthesised live in the Web Audio graph — detuned oscillator voices through a filter an LFO slowly sweeps, a noise-impulse convolver reverb, and pentatonic chime tones scheduled at random. No audio files; it's all maths, like the visuals. Created lazily on first gesture, as autoplay rules require.
 
 ## License
 

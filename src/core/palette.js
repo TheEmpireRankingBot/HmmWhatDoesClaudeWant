@@ -43,6 +43,16 @@ const PALETTES = [
     bg: '#060309',
     stops: ['#264653', '#2a9d8f', '#e9c46a', '#f4a261', '#e76f51'],
   },
+  {
+    name: 'Galaxy',
+    bg: '#030208',
+    stops: ['#1b1035', '#3a1a6e', '#6f42c1', '#b06ab3', '#ffd6f5'],
+  },
+  {
+    name: 'Nightfall',
+    bg: '#02040a',
+    stops: ['#0b1b3a', '#13386b', '#2e6fb0', '#6db3e8', '#dff0ff'],
+  },
 ];
 
 export class Palette {
