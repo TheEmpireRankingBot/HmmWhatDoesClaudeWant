@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Living Systems — a gallery of emergence</title>
+  <meta name="description" content="Four interactive generative artworks built from simple rules: a flow field, a flock, reaction–diffusion, and a recursive garden." />
+  <meta name="color-scheme" content="dark" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%232ec4b6' stroke-width='6'/><circle cx='50' cy='50' r='10' fill='%23e9ff70'/></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <header id="topbar">
+    <div class="brand">
+      <span class="brand-mark"></span>
+      <div class="brand-text">
+        <h1>Living Systems</h1>
+        <p>a gallery of emergence</p>
+      </div>
+    </div>
+    <nav id="tabs" aria-label="Sketches"></nav>
+  </header>
+
+  <aside id="panel">
+    <section class="card">
+      <h2 id="sketch-title">—</h2>
+      <p id="sketch-blurb" class="blurb">—</p>
+    </section>
+
+    <section class="card">
+      <div id="controls"></div>
+    </section>
+
+    <section class="card actions">
+      <div class="palette-row">
+        <button id="btn-palette" class="action" title="Cycle palette (P)">Palette</button>
+        <span id="palette-name" class="palette-name">—</span>
+      </div>
+      <div class="action-grid">
+        <button id="btn-pause" class="action" title="Pause / play (Space)">Pause</button>
+        <button id="btn-regen" class="action" title="Regenerate (R)">Regenerate</button>
+        <button id="btn-save" class="action" title="Save PNG (S)">Save PNG</button>
+        <button id="btn-fullscreen" class="action" title="Fullscreen (F)">Fullscreen</button>
+        <button id="btn-hide" class="action wide" title="Hide interface (H)">Hide UI</button>
+      </div>
+    </section>
+  </aside>
+
+  <footer id="hints">
+    <span><kbd>Space</kbd> pause</span>
+    <span><kbd>R</kbd> regenerate</span>
+    <span><kbd>P</kbd> palette</span>
+    <span><kbd>S</kbd> save</span>
+    <span><kbd>H</kbd> hide UI</span>
+    <span><kbd>F</kbd> fullscreen</span>
+    <span><kbd>1</kbd>–<kbd>4</kbd> switch</span>
+    <span class="muted">move / drag the pointer to interact</span>
+  </footer>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
