@@ -1,0 +1,8 @@
+# This is a dependency-free static site — nothing to build.
+# Ignore the usual local cruft only.
+.DS_Store
+Thumbs.db
+node_modules/
+*.log
+.vscode/
+.idea/

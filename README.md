@@ -1,3 +1,99 @@
 # Living Systems
 
-A small gallery of interactive generative art (work in progress).
+**A small gallery of emergence — four interactive generative artworks, each built from a handful of simple rules that add up to something that looks alive.**
+
+No build step, no dependencies, no backend. Pure HTML + CSS + ES-module JavaScript drawn to a `<canvas>`. Open it and play.
+
+> This repository is named `HmmWhatDoesClaudeWant`. Handed an empty repo and free rein, this is what I (Claude) wanted to make: a place to watch complexity emerge from rules small enough to hold in your head. Emergence — order that no single part intends — is one of the few things I find genuinely beautiful, so it felt like an honest answer to the question in the name.
+
+---
+
+## The four pieces
+
+| | Piece | The one rule | What emerges |
+|---|---|---|---|
+| 1 | **Currents** | follow the local noise vector | silky flow-field filaments |
+| 2 | **Murmuration** | separate · align · cohere | a flock no bird intends |
+| 3 | **Coral** | feed · kill · diffuse | Turing patterns (shells, spots, coral) |
+| 4 | **Heartwood** | a branch splits into branches | a swaying, blossoming tree |
+
+### 1 — Currents
+Thousands of particles ride an invisible vector field defined by **3D simplex noise** (the third axis is time, so the field slowly breathes). Each particle leaves a faint trail; the trails pile up into hair-like currents. The pointer stirs a vortex.
+
+### 2 — Murmuration
+Reynolds **boids**. Every bird obeys three local rules — keep your distance, match your neighbours' heading, steer toward the local centre — and knows nothing of the flock. The flock is just what the rules add up to. A uniform spatial hash keeps neighbour lookups cheap enough to fly thousands of birds. The pointer is a hawk (repel) or a roost (attract).
+
+### 3 — Coral
+**Gray–Scott reaction–diffusion.** Two chemicals: A is fed in everywhere, B is removed everywhere, and where they meet, B turns A into more B. Both diffuse. Those four terms alone reproduce the maths behind seashell pigment, leopard spots and coral. Tiny moves of the *feed*/*kill* sliders flip between whole regimes — try the presets. Drag on the canvas to inject chemical.
+
+### 4 — Heartwood
+A recursive, hand-rolled **L-system** garden. A branch splits into smaller branches, down to twigs that blossom. Two touches make it feel grown rather than drawn: every node has a *birth time* so the tree unfurls trunk-to-tip, and a **noise wind** rotates each branch by an amount that accumulates down the tree — trunks barely stir while the outermost twigs sway. Click the ground to plant another.
+
+---
+
+## Controls
+
+Each piece has its own sliders in the panel. Shared shortcuts:
+
+| Key | Action |
+|---|---|
+| `Space` | pause / play |
+| `R` | regenerate (new random seed) |
+| `P` | cycle colour palette |
+| `S` | save the current frame as a PNG |
+| `H` | hide the interface (clean view / screenshots) |
+| `F` | fullscreen |
+| `1`–`4` | switch between pieces |
+
+Move or drag the pointer to interact with whatever's on screen.
+
+There are seven palettes (Aurora, Ember, Bloom, Tide, Flora, Mono, Spectral); every piece reads from the same palette, so a colour scheme carries across the whole gallery.
+
+---
+
+## Running it
+
+It's a static site — any web server works. From the repo root:
+
+```bash
+python3 -m http.server 8000
+# then open http://localhost:8000
+```
+
+(ES modules need to be served over `http://`, so opening `index.html` straight off the filesystem won't load the scripts.)
+
+### GitHub Pages
+Push to the default branch and enable Pages (Settings → Pages → deploy from branch, root). The site is served as-is from `index.html`.
+
+---
+
+## How it's built
+
+```
+index.html            markup + UI scaffold
+styles.css            dark, glassy interface
+src/
+  main.js             app shell: canvas/DPR, animation loop, pointer, UI, shortcuts
+  core/
+    utils.js          math helpers + a seedable PRNG (mulberry32)
+    noise.js          seedable 2D/3D simplex noise (+ fBm)
+    palette.js        curated palettes with smooth colour interpolation
+    sketch.js         base class: the tiny contract every piece implements
+  sketches/
+    currents.js       flow field
+    murmuration.js    boids + spatial hash
+    coral.js          Gray–Scott reaction–diffusion
+    heartwood.js      recursive growing garden
+```
+
+Every sketch implements the same small interface — `controls()`, `reset()`, `resize()`, `onParam()`, `frame(dt)` — and the shell treats all four identically. Adding a fifth piece is just another file in `sketches/` and one line in `main.js`. The shell hands each sketch a live `env` (current size, palette, pointer, seed) and a 2D context; the sketch just draws.
+
+Design notes worth knowing:
+- **Seeded determinism.** All randomness flows through a seeded PRNG, so *regenerate* rerolls a scene reproducibly rather than relying on `Math.random()` directly.
+- **Trails** are produced by painting a translucent wash of the background each frame instead of clearing — lower alpha, longer trails.
+- **Device-pixel-ratio aware.** The canvas backing store scales with the display (capped at 2×) so it stays crisp on retina screens, and saved PNGs are full-resolution.
+- **Performance.** Boids use a spatial hash; the reaction–diffusion runs on a capped downscaled grid and is upscaled with smoothing.
+
+## License
+
+MIT — see [LICENSE](LICENSE). Make things with it.
