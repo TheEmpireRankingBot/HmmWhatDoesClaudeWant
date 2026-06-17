@@ -244,7 +244,40 @@ select {
 .action:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.18); }
 .action:active { transform: translateY(1px); }
 .action.wide { grid-column: 1 / -1; }
+.action:disabled { opacity: 0.4; cursor: not-allowed; }
 #btn-palette { flex: none; }
+
+/* Sound toggle lights up when on. */
+.action.on {
+  color: #04150f;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+  font-weight: 600;
+}
+/* Sleep-mode call-to-action. */
+.action.accent {
+  border-color: rgba(46, 196, 182, 0.5);
+  background: rgba(46, 196, 182, 0.12);
+  color: var(--ink);
+}
+.action.accent:hover { background: rgba(46, 196, 182, 0.22); }
+
+/* ---- Ambience card ------------------------------------------------------ */
+.card-heading {
+  margin: 0 0 4px;
+  font-size: 13px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.card-note {
+  margin: 0 0 12px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.ambience .control { padding-top: 10px; }
+.ambience .control + .control { border-top: none; }
 
 /* ---- Hints -------------------------------------------------------------- */
 #hints {

@@ -46,6 +46,23 @@
         <button id="btn-hide" class="action wide" title="Hide interface (H)">Hide UI</button>
       </div>
     </section>
+
+    <section class="card ambience">
+      <h3 class="card-heading">Ambience</h3>
+      <p class="card-note">Generative drone + soft chimes. A calming companion for sleep or focus — best in fullscreen with the UI hidden.</p>
+      <div class="action-grid">
+        <button id="btn-sound" class="action" title="Toggle sound (M)">Sound: off</button>
+        <button id="btn-sleep" class="action accent" title="Cosmos · soft audio · fullscreen">Sleep mode</button>
+      </div>
+      <div class="control">
+        <label>Volume</label>
+        <input id="vol" type="range" min="0" max="1" step="0.01" value="0.55" />
+      </div>
+      <div class="control">
+        <label>Chimes</label>
+        <input id="twinkle" type="range" min="0" max="1" step="0.05" value="0.5" />
+      </div>
+    </section>
   </aside>
 
   <footer id="hints">
@@ -55,7 +72,8 @@
     <span><kbd>S</kbd> save</span>
     <span><kbd>H</kbd> hide UI</span>
     <span><kbd>F</kbd> fullscreen</span>
-    <span><kbd>1</kbd>–<kbd>4</kbd> switch</span>
+    <span><kbd>M</kbd> sound</span>
+    <span><kbd>1</kbd>–<kbd>5</kbd> switch</span>
     <span class="muted">move / drag the pointer to interact</span>
   </footer>
 
