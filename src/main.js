@@ -11,9 +11,10 @@ import { Currents } from './sketches/currents.js';
 import { Murmuration } from './sketches/murmuration.js';
 import { Coral } from './sketches/coral.js';
 import { Heartwood } from './sketches/heartwood.js';
+import { Mycelium } from './sketches/mycelium.js';
 import { Cosmos } from './sketches/cosmos.js';
 
-const SKETCHES = [Currents, Murmuration, Coral, Heartwood, Cosmos];
+const SKETCHES = [Currents, Murmuration, Coral, Heartwood, Mycelium, Cosmos];
 
 const canvas = document.getElementById('stage');
 const ctx = canvas.getContext('2d', { alpha: false });
@@ -315,6 +316,7 @@ window.addEventListener('keydown', (e) => {
     case '3': selectSketch(SKETCHES[2]); break;
     case '4': selectSketch(SKETCHES[3]); break;
     case '5': selectSketch(SKETCHES[4]); break;
+    case '6': selectSketch(SKETCHES[5]); break;
   }
 });
 
