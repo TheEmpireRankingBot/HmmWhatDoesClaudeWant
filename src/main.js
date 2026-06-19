@@ -7,6 +7,7 @@
 import { PaletteBook } from './core/palette.js';
 import { randomSeed } from './core/utils.js';
 import { AudioEngine } from './core/audio.js';
+import { config, isLink, verifyLicence } from './core/config.js';
 import { Currents } from './sketches/currents.js';
 import { Murmuration } from './sketches/murmuration.js';
 import { Coral } from './sketches/coral.js';
@@ -336,6 +337,7 @@ function exportDims(choice) {
   if (choice === '4k') return { w: 3840, h: 2160 };
   if (choice === 'phone') return { w: 1080, h: 1920 };
   if (choice === 'square') return { w: 2160, h: 2160 };
+  if (choice === '8k') return { w: 7680, h: 4320 };
   return { w: env.width, h: env.height };
 }
 
@@ -371,6 +373,11 @@ async function savePNG() {
   const name = active.constructor.id;
   const sel = document.getElementById('export-size');
   const choice = sel ? sel.value : 'screen';
+  if (choice === '8k' && !pro) {
+    showToast('8K export is a Pro feature');
+    if (isLink(config.links.shop)) window.open(config.links.shop, '_blank', 'noopener');
+    return;
+  }
   let dataURL;
   let w = env.width, h = env.height;
   if (choice === 'screen') {
@@ -439,6 +446,65 @@ function copyEmbed() {
   const done = () => showToast('Embed code copied');
   if (navigator.clipboard) navigator.clipboard.writeText(snippet).then(done, done);
   else done();
+}
+
+// ---- Monetisation: support links + a Pro licence --------------------------
+let pro = false;
+try { pro = localStorage.getItem('ls_pro') === '1'; } catch (e) { /* no storage */ }
+
+function applyPro() {
+  document.body.classList.toggle('pro', pro);
+  const btn = document.getElementById('btn-pro');
+  if (btn) {
+    btn.textContent = pro ? 'Pro ✓ unlocked' : 'Unlock Pro';
+    btn.disabled = pro;
+    btn.classList.toggle('on', pro);
+  }
+}
+
+function setPro(on) {
+  pro = on;
+  try { localStorage.setItem('ls_pro', on ? '1' : '0'); } catch (e) { /* ignore */ }
+  applyPro();
+}
+
+async function unlockPro() {
+  const key = window.prompt(`Enter your ${config.brand} licence key:`);
+  if (key == null) return;
+  showToast('Checking licence…');
+  const ok = await verifyLicence(key);
+  if (ok) { setPro(true); showToast('Pro unlocked — thank you ✦'); }
+  else showToast('That key didn’t check out');
+}
+
+/** Reveal the support card / buttons that have actually been configured. */
+function buildSupportUI() {
+  const card = document.getElementById('support-card');
+  const sup = document.getElementById('link-support');
+  const shop = document.getElementById('link-shop');
+  const proBtn = document.getElementById('btn-pro');
+  let any = false;
+  if (isLink(config.links.support)) { sup.href = config.links.support; sup.hidden = false; any = true; }
+  if (isLink(config.links.shop)) { shop.href = config.links.shop; shop.hidden = false; any = true; }
+  const proConfigured =
+    (config.pro.keyHashes && config.pro.keyHashes.length > 0) || !!config.pro.gumroadProductId;
+  if (proConfigured || pro) { proBtn.hidden = false; any = true; }
+  if (any) card.hidden = false;
+  if (proBtn) proBtn.addEventListener('click', unlockPro);
+  applyPro();
+}
+
+/** On a free embed, drop a small back-link badge (your discovery loop). */
+function maybeAddEmbedBadge() {
+  if (!document.body.classList.contains('embed')) return;
+  if (pro || !isLink(config.siteUrl)) return;
+  const a = document.createElement('a');
+  a.className = 'embed-badge';
+  a.href = config.siteUrl + (config.siteUrl.includes('?') ? '&' : '?') + 'ref=embed';
+  a.target = '_blank';
+  a.rel = 'noopener';
+  a.textContent = '✦ ' + config.brand;
+  document.body.appendChild(a);
 }
 
 function toggleFullscreen() {
@@ -552,6 +618,7 @@ window.LivingSystems = {
   get palette() { return book.current.name; },
   get audioLevel() { return audio.level; },
   get autoCycle() { return autoCycle; },
+  get pro() { return pro; },
   _lastRecBytes: 0,
   _lastExport: null,
   share: shareLink,
@@ -569,5 +636,9 @@ if (!applyHash()) selectSketch(SKETCHES[0], { fresh: false });
 const boot = new URLSearchParams(location.search);
 if (boot.get('embed') === '1') document.body.classList.add('embed');
 if (boot.get('cycle') === '1') toggleAutoCycle();
+
+// Monetisation surfaces (all opt-in via src/core/config.js).
+buildSupportUI();
+maybeAddEmbedBadge();
 
 requestAnimationFrame(loop);
