@@ -339,6 +339,36 @@ body.ui-hidden #hints {
 }
 #topbar, #panel, #hints { transition: opacity 0.3s ease; }
 
+/* ---- Support / monetisation --------------------------------------------- */
+a.action {
+  text-decoration: none;
+  text-align: center;
+  display: block;
+}
+.card.support .card-heading { color: var(--accent-2); }
+
+/* Small back-link badge shown on free embeds (removed by a Pro licence). */
+.embed-badge {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 30;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  color: var(--ink);
+  background: rgba(8, 11, 18, 0.5);
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  padding: 5px 11px;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0.66;
+  transition: opacity 0.2s ease;
+}
+.embed-badge:hover { opacity: 1; }
+body.pro .embed-badge { display: none; }
+
 /* ---- Embed mode (chrome-less live background) ---------------------------- */
 body.embed #topbar,
 body.embed #panel,

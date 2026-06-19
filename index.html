@@ -6,6 +6,14 @@
   <title>Living Systems — a gallery of emergence</title>
   <meta name="description" content="Seven interactive generative artworks built from simple rules: a flow field, a flock, reaction–diffusion, a recursive garden, a slime-mould network, a fluid sim, and a starfield — with a generative ambient soundtrack." />
   <meta name="color-scheme" content="dark" />
+  <meta property="og:title" content="Living Systems — a gallery of emergence" />
+  <meta property="og:description" content="Seven interactive generative artworks built from simple rules — flock, fluid, slime mould, starfield and more. Make a scene, export a 4K wallpaper or a clip, or embed it live." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Living Systems — a gallery of emergence" />
+  <meta name="twitter:description" content="Seven interactive generative artworks. Make a scene, export a 4K wallpaper or clip, or embed it live." />
+  <meta name="twitter:image" content="og.png" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%232ec4b6' stroke-width='6'/><circle cx='50' cy='50' r='10' fill='%23e9ff70'/></svg>" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -58,12 +66,23 @@
           <option value="4k" selected>4K — 3840 × 2160</option>
           <option value="phone">Phone — 1080 × 1920</option>
           <option value="square">Square — 2160 × 2160</option>
+          <option value="8k">8K — 7680 × 4320 (Pro)</option>
         </select>
       </div>
       <div class="action-grid">
         <button id="btn-save" class="action" title="Save still image (S)">Save image</button>
         <button id="btn-record" class="action" title="Record a WebM clip (V)">Record</button>
         <button id="btn-embed" class="action wide" title="Copy an iframe embed snippet (E)">Copy embed code</button>
+      </div>
+    </section>
+
+    <section class="card support" id="support-card" hidden>
+      <h3 class="card-heading">Support &amp; unlock</h3>
+      <p class="card-note">Enjoying it? Keep it growing — or unlock Pro for 8K export and badge-free embeds.</p>
+      <div class="action-grid">
+        <a id="link-support" class="action accent wide" target="_blank" rel="noopener" hidden>♥ Support monthly</a>
+        <a id="link-shop" class="action wide" target="_blank" rel="noopener" hidden>Get the packs</a>
+        <button id="btn-pro" class="action wide" hidden>Unlock Pro</button>
       </div>
     </section>
 

@@ -108,7 +108,32 @@ Two URL flags drive embeds:
 
 Everything after `#` is just a shared-scene link, so you can pin an embed to one exact scene or let it wander. It's all static files, so an embed costs you nothing to host.
 
-There's also a tiny read-only `window.LivingSystems` hook (`sketch`, `palette`, `audioLevel`, `autoCycle`) for scripting or analytics.
+There's also a tiny read-only `window.LivingSystems` hook (`sketch`, `palette`, `audioLevel`, `autoCycle`, `pro`) for scripting or analytics.
+
+---
+
+## Make it earn
+
+The gallery ships with an **opt-in monetisation layer** — one file, [`src/core/config.js`](src/core/config.js), turns it on. With the empty defaults nothing appears, so the public site stays clean; fill in your own links and each piece lights up. It's all static, so there's no backend to run and nothing costs you anything to host.
+
+The funnel it builds:
+
+1. **Discovery** — a share card (`og.png` + OpenGraph/Twitter tags) so links look good when posted, and a small back-link **badge on free embeds** that points visitors back to your site. Every embed someone drops on their page becomes an advert for yours.
+2. **Product** — the export layer: 4K/8K wallpapers, video clips, and live embeds. Because every scene is a reproducible seed, the catalogue is effectively infinite.
+3. **Checkout** — your own links: **Support monthly** (Patreon / Ko-fi / GitHub Sponsors → recurring income) and **Get the packs** (Gumroad / Lemon Squeezy → one-off sales). These buttons only appear once you set the URLs.
+4. **Upsell** — a **Pro licence** (sold via your shop) that removes the embed badge (white-label) and unlocks **8K export**. Keys are verified either against an offline SHA-256 allow-list or live against Gumroad's licence API, and the unlock persists in `localStorage`.
+
+```js
+// src/core/config.js — fill these in to switch it on
+siteUrl: 'https://your-site',
+links: {
+  support: 'https://patreon.com/you',      // recurring
+  shop:    'https://you.gumroad.com/l/packs' // one-off
+},
+pro: { keyHashes: ['<sha256 of a key you sell>'], gumroadProductId: '' },
+```
+
+> The Pro gate is a client-side soft licence (standard for indie tools) — honest, not DRM. Pair it with a real checkout (Gumroad/Ko-fi) and it's a working store.
 
 There are nine palettes (Aurora, Ember, Bloom, Tide, Flora, Mono, Spectral, Galaxy, Nightfall); every piece reads from the same palette, so a colour scheme carries across the whole gallery.
 
@@ -142,6 +167,7 @@ src/
     noise.js          seedable 2D/3D simplex noise (+ fBm)
     palette.js        curated palettes with smooth colour interpolation
     audio.js          generative ambient audio engine (Web Audio)
+    config.js         opt-in monetisation & branding (support, shop, Pro)
     sketch.js         base class: the tiny contract every piece implements
   sketches/
     currents.js       flow field
