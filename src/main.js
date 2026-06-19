@@ -45,6 +45,11 @@ let paused = false;
 let lastTime = performance.now();
 const controlInputs = new Map(); // param key -> { input, readout }
 
+// Auto-cycle ("gallery" / screensaver) mode.
+let autoCycle = false;
+let autoCycleTimer = 0;
+const CYCLE_SECONDS = 20;
+
 // ---- Canvas sizing with device-pixel-ratio --------------------------------
 function resize() {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -86,13 +91,27 @@ function regenerate() {
 function loop(now) {
   const dt = Math.min((now - lastTime) / 1000, 1 / 30); // clamp big gaps
   lastTime = now;
+  // Update the reactive audio level first, so sketches read a fresh value.
+  audio.update(dt);
+  if (autoCycle && !paused) {
+    autoCycleTimer -= dt;
+    if (autoCycleTimer <= 0) advanceCycle();
+  }
   if (active && !paused) {
     active.frame(dt);
   }
-  audio.update(dt);
   // justPressed is a one-frame pulse.
   env.pointer.justPressed = false;
   requestAnimationFrame(loop);
+}
+
+// Advance to the next piece with a fresh palette and seed (gallery mode).
+function advanceCycle() {
+  const i = SKETCHES.findIndex((S) => active && S.id === active.constructor.id);
+  const next = SKETCHES[(i + 1) % SKETCHES.length];
+  cyclePalette();
+  selectSketch(next);
+  autoCycleTimer = CYCLE_SECONDS;
 }
 
 // ---- Pointer --------------------------------------------------------------
@@ -366,6 +385,15 @@ async function sleepMode() {
   if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
 }
 
+/** Auto-cycle / "gallery" mode: drift between pieces and palettes on a timer. */
+function toggleAutoCycle() {
+  autoCycle = !autoCycle;
+  autoCycleTimer = CYCLE_SECONDS;
+  const btn = document.getElementById('btn-cycle');
+  btn.classList.toggle('on', autoCycle);
+  btn.textContent = autoCycle ? 'Auto-cycle: on' : 'Auto-cycle';
+}
+
 // ---- Buttons --------------------------------------------------------------
 document.getElementById('btn-pause').addEventListener('click', togglePause);
 document.getElementById('btn-regen').addEventListener('click', regenerate);
@@ -376,6 +404,7 @@ document.getElementById('btn-share').addEventListener('click', shareLink);
 document.getElementById('btn-hide').addEventListener('click', toggleUI);
 btnSound.addEventListener('click', toggleSound);
 document.getElementById('btn-sleep').addEventListener('click', sleepMode);
+document.getElementById('btn-cycle').addEventListener('click', toggleAutoCycle);
 
 const volInput = document.getElementById('vol');
 const twinkleInput = document.getElementById('twinkle');
@@ -397,6 +426,7 @@ window.addEventListener('keydown', (e) => {
     case 'f': toggleFullscreen(); break;
     case 'm': toggleSound(); break;
     case 'c': shareLink(); break;
+    case 'g': toggleAutoCycle(); break;
     default: {
       // Number keys 1..N switch pieces.
       const n = parseInt(e.key, 10);
@@ -408,6 +438,15 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('resize', resize);
 // Restore a scene when the hash is changed by hand or by navigation.
 window.addEventListener('hashchange', applyHash);
+
+// A tiny read-only public hook — handy for embedding, debugging or scripting.
+window.LivingSystems = {
+  get sketch() { return active ? active.constructor.id : null; },
+  get palette() { return book.current.name; },
+  get audioLevel() { return audio.level; },
+  get autoCycle() { return autoCycle; },
+  share: shareLink,
+};
 
 // ---- Boot -----------------------------------------------------------------
 buildTabs();

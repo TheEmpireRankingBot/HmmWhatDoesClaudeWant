@@ -133,6 +133,8 @@ export class Heartwood extends Sketch {
     const { ctx, env } = this;
     const { width, height, palette, pointer } = env;
     this.time += dt;
+    // Audio-reactive: stronger wind on louder passages (0 when silent).
+    this._level = env.audio?.level || 0;
 
     // Plant where the user clicks near the ground.
     if (pointer.inside && pointer.justPressed) {
@@ -167,7 +169,7 @@ export class Heartwood extends Sketch {
     // the sway compounds toward the twigs.
     const wind =
       this.noise.noise2D(this.time * 0.4 + tree.phase, node.depth * 0.5) *
-      P.wind * 0.06;
+      P.wind * 0.06 * (1 + (this._level || 0) * 1.4);
 
     const angle = parentAngle + node.relAngle + wind;
     const len = node.length * tree.scale * t;

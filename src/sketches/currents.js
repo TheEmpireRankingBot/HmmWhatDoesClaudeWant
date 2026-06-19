@@ -69,7 +69,9 @@ export class Currents extends Sketch {
     this.t += dt * P.flow * 0.12;
 
     const fieldScale = P.scale * 0.0016;
-    const step = P.speed * 60 * dt; // px per frame, normalised to ~60fps
+    // Audio-reactive: the flow quickens with the soundtrack (0 when silent).
+    const level = env.audio?.level || 0;
+    const step = P.speed * 60 * dt * (1 + level * 1.3); // px per frame, ~60fps
     ctx.lineWidth = 1;
 
     for (const part of this.particles) {
