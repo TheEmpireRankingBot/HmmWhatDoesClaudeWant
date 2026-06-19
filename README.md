@@ -135,6 +135,8 @@ pro: { keyHashes: ['<sha256 of a key you sell>'], gumroadProductId: '' },
 
 > The Pro gate is a client-side soft licence (standard for indie tools) — honest, not DRM. Pair it with a real checkout (Gumroad/Ko-fi) and it's a working store.
 
+The published root (`index.html`) is a premium **landing / shop** page — an editorial showcase whose backdrop is a live embed of the gallery itself — with the interactive gallery one click away at **`app.html`**. The edition CTAs read their URLs from the same `config.js`, so there's one place to configure everything.
+
 There are nine palettes (Aurora, Ember, Bloom, Tide, Flora, Mono, Spectral, Galaxy, Nightfall); every piece reads from the same palette, so a colour scheme carries across the whole gallery.
 
 ---
@@ -158,8 +160,11 @@ Push to the default branch and enable Pages (Settings → Pages → deploy from 
 ## How it's built
 
 ```
-index.html            markup + UI scaffold
-styles.css            dark, glassy interface
+index.html            premium landing / shop page
+landing.css           landing styles (editorial, serif display)
+landing.js            wires edition CTAs from config.js
+app.html              the gallery app — markup + UI scaffold
+styles.css            dark, glassy gallery interface
 src/
   main.js             app shell: canvas/DPR, animation loop, pointer, UI, shortcuts
   core/

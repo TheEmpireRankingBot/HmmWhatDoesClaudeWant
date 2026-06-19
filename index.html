@@ -2,125 +2,123 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Living Systems — a gallery of emergence</title>
-  <meta name="description" content="Seven interactive generative artworks built from simple rules: a flow field, a flock, reaction–diffusion, a recursive garden, a slime-mould network, a fluid sim, and a starfield — with a generative ambient soundtrack." />
+  <meta name="description" content="Seven interactive generative artworks, each grown from a single rule — a flock, a fluid, a slime mould, a sky. Watch them, shape them, and take them with you as 4K wallpapers, films and living embeds." />
   <meta name="color-scheme" content="dark" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%232ec4b6' stroke-width='6'/><circle cx='50' cy='50' r='10' fill='%23e9ff70'/></svg>" />
   <meta property="og:title" content="Living Systems — a gallery of emergence" />
-  <meta property="og:description" content="Seven interactive generative artworks built from simple rules — flock, fluid, slime mould, starfield and more. Make a scene, export a 4K wallpaper or a clip, or embed it live." />
+  <meta property="og:description" content="Seven interactive generative artworks grown from single rules. Watch them, shape them, and take them with you as 4K wallpapers, films and living embeds." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Living Systems — a gallery of emergence" />
-  <meta name="twitter:description" content="Seven interactive generative artworks. Make a scene, export a 4K wallpaper or clip, or embed it live." />
   <meta name="twitter:image" content="og.png" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%232ec4b6' stroke-width='6'/><circle cx='50' cy='50' r='10' fill='%23e9ff70'/></svg>" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="landing.css" />
 </head>
-<body>
-  <canvas id="stage"></canvas>
+<body id="top">
+  <!-- The backdrop is a real embed of the gallery itself, drifting on its own. -->
+  <div class="backdrop" aria-hidden="true">
+    <iframe src="app.html?embed=1&amp;cycle=1#s=ink&amp;p=Tide&amp;seed=88119&amp;swirl=22&amp;force=8&amp;fade=0.993&amp;iters=18&amp;resolution=high&amp;colour=both"
+            title="" tabindex="-1" loading="eager" scrolling="no"></iframe>
+    <div class="scrim"></div>
+  </div>
 
-  <header id="topbar">
-    <div class="brand">
-      <span class="brand-mark"></span>
-      <div class="brand-text">
-        <h1>Living Systems</h1>
-        <p>a gallery of emergence</p>
-      </div>
-    </div>
-    <nav id="tabs" aria-label="Sketches"></nav>
+  <header class="site">
+    <a class="wordmark" href="#top"><span class="mark"></span>Living Systems</a>
+    <nav>
+      <a href="#works">Works</a>
+      <a href="#editions">Editions</a>
+      <a class="enter" href="app.html">Enter the gallery&nbsp;<span aria-hidden="true">→</span></a>
+    </nav>
   </header>
 
-  <aside id="panel">
-    <section class="card">
-      <h2 id="sketch-title">—</h2>
-      <p id="sketch-blurb" class="blurb">—</p>
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Generative art — emergent systems</p>
+      <h1>Things that behave<br />as if <em>alive</em>.</h1>
+      <p class="lede">A gallery of seven worlds, each grown from a single rule — a flock, a fluid, a slime mould, a sky. Watch them, shape them, and take them with you as wallpapers, films and living embeds.</p>
+      <div class="actions">
+        <a class="btn primary" href="app.html">Enter the gallery</a>
+        <a class="btn ghost" href="#editions">View editions</a>
+      </div>
+      <p class="bg-note"><span class="tick"></span> The backdrop is one of the pieces, running live — the very embed you can license.</p>
     </section>
 
-    <section class="card">
-      <div id="controls"></div>
+    <section id="works" class="panel works">
+      <div class="sec-head">
+        <span class="sec-no">01</span>
+        <h2>The works</h2>
+        <p class="sec-sub">Seven systems. One rule each. No two moments alike — and every one reproducible from a seed.</p>
+      </div>
+      <ol class="catalogue">
+        <li><span class="rn">I</span><div class="w"><h3>Currents</h3><p>Ten thousand specks adrift on an invisible tide of noise.</p></div></li>
+        <li><span class="rn">II</span><div class="w"><h3>Murmuration</h3><p>Three rules per bird, and a flock that no bird intends.</p></div></li>
+        <li><span class="rn">III</span><div class="w"><h3>Coral</h3><p>Two chemicals, feeding and fleeing, painting living Turing patterns.</p></div></li>
+        <li><span class="rn">IV</span><div class="w"><h3>Heartwood</h3><p>One branch becomes two; a tree unfurls and sways in a noise wind.</p></div></li>
+        <li><span class="rn">V</span><div class="w"><h3>Mycelium</h3><p>A slime mould that wires itself into the most efficient map.</p></div></li>
+        <li><span class="rn">VI</span><div class="w"><h3>Ink</h3><p>A true fluid you push with a fingertip; it keeps drifting after.</p></div></li>
+        <li><span class="rn">VII</span><div class="w"><h3>Cosmos</h3><p>A slow fall through stars, nebula and the occasional meteor.</p></div></li>
+      </ol>
+      <a class="seeall" href="app.html">See all seven, live&nbsp;<span aria-hidden="true">→</span></a>
     </section>
 
-    <section class="card actions">
-      <div class="palette-row">
-        <button id="btn-palette" class="action" title="Cycle palette (P)">Palette</button>
-        <span id="palette-name" class="palette-name">—</span>
+    <section id="editions" class="panel editions">
+      <div class="sec-head">
+        <span class="sec-no">02</span>
+        <h2>Editions</h2>
+        <p class="sec-sub">Every scene is exact and reproducible, so each edition is a true original — and the catalogue is endless.</p>
       </div>
-      <div class="action-grid">
-        <button id="btn-pause" class="action" title="Pause / play (Space)">Pause</button>
-        <button id="btn-regen" class="action" title="Regenerate (R)">Regenerate</button>
-        <button id="btn-fullscreen" class="action" title="Fullscreen (F)">Fullscreen</button>
-        <button id="btn-hide" class="action" title="Hide interface (H)">Hide UI</button>
-        <button id="btn-share" class="action wide" title="Copy a link to this exact scene (C)">Copy link</button>
-      </div>
-    </section>
-
-    <section class="card export">
-      <h3 class="card-heading">Export &amp; embed</h3>
-      <p class="card-note">Save a wallpaper, record a clip, or drop this scene into any site as a live background.</p>
-      <div class="control">
-        <label>Image size</label>
-        <select id="export-size">
-          <option value="screen">Screen</option>
-          <option value="2x">2× screen</option>
-          <option value="4k" selected>4K — 3840 × 2160</option>
-          <option value="phone">Phone — 1080 × 1920</option>
-          <option value="square">Square — 2160 × 2160</option>
-          <option value="8k">8K — 7680 × 4320 (Pro)</option>
-        </select>
-      </div>
-      <div class="action-grid">
-        <button id="btn-save" class="action" title="Save still image (S)">Save image</button>
-        <button id="btn-record" class="action" title="Record a WebM clip (V)">Record</button>
-        <button id="btn-embed" class="action wide" title="Copy an iframe embed snippet (E)">Copy embed code</button>
-      </div>
-    </section>
-
-    <section class="card support" id="support-card" hidden>
-      <h3 class="card-heading">Support &amp; unlock</h3>
-      <p class="card-note">Enjoying it? Keep it growing — or unlock Pro for 8K export and badge-free embeds.</p>
-      <div class="action-grid">
-        <a id="link-support" class="action accent wide" target="_blank" rel="noopener" hidden>♥ Support monthly</a>
-        <a id="link-shop" class="action wide" target="_blank" rel="noopener" hidden>Get the packs</a>
-        <button id="btn-pro" class="action wide" hidden>Unlock Pro</button>
+      <div class="grid">
+        <article class="ed">
+          <p class="kind">Stills</p>
+          <h3>4K &amp; 8K wallpapers</h3>
+          <p>Rendered at true resolution from any scene you compose. For desktops, phones and prints.</p>
+          <a id="cta-shop" class="ed-cta" href="app.html">Get the packs&nbsp;<span aria-hidden="true">→</span></a>
+        </article>
+        <article class="ed">
+          <p class="kind">Films</p>
+          <h3>Looping clips</h3>
+          <p>Record any piece to a clean, seamless WebM loop for screens and socials.</p>
+          <a class="ed-cta" href="app.html">Make one&nbsp;<span aria-hidden="true">→</span></a>
+        </article>
+        <article class="ed feature">
+          <p class="kind">Membership</p>
+          <h3>New editions, monthly</h3>
+          <p>Support the work and receive a fresh set of wallpapers and films every month.</p>
+          <a id="cta-support" class="ed-cta" href="app.html">Support monthly&nbsp;<span aria-hidden="true">→</span></a>
+        </article>
+        <article class="ed">
+          <p class="kind">Pro licence</p>
+          <h3>8K &amp; white-label</h3>
+          <p>Unlock 8K export and remove the badge from your embeds. A one-time key.</p>
+          <a id="cta-pro" class="ed-cta" href="app.html">Unlock Pro&nbsp;<span aria-hidden="true">→</span></a>
+        </article>
       </div>
     </section>
 
-    <section class="card ambience">
-      <h3 class="card-heading">Ambience</h3>
-      <p class="card-note">Generative drone + soft chimes. A calming companion for sleep or focus — best in fullscreen with the UI hidden.</p>
-      <div class="action-grid">
-        <button id="btn-sound" class="action" title="Toggle sound (M)">Sound: off</button>
-        <button id="btn-sleep" class="action accent" title="Cosmos · soft audio · fullscreen">Sleep mode</button>
-        <button id="btn-cycle" class="action wide" title="Drift between pieces and palettes (G)">Auto-cycle</button>
+    <section id="embed" class="panel embed-sec">
+      <div class="sec-head">
+        <span class="sec-no">03</span>
+        <h2>A living background</h2>
+        <p class="sec-sub">Any scene drops into your own site as a self-contained frame — no scripts, no tracking, nothing to run. This very page wears one.</p>
       </div>
-      <div class="control">
-        <label>Volume</label>
-        <input id="vol" type="range" min="0" max="1" step="0.01" value="0.55" />
-      </div>
-      <div class="control">
-        <label>Chimes</label>
-        <input id="twinkle" type="range" min="0" max="1" step="0.05" value="0.5" />
+      <div class="embed-body">
+        <pre aria-hidden="true"><code><span class="t">&lt;iframe</span> <span class="a">src</span>=<span class="s">"…/app.html?embed=1#s=ink&amp;p=Tide&amp;…"</span>
+        <span class="a">style</span>=<span class="s">"width:100%;height:100%;border:0"</span><span class="t">&gt;&lt;/iframe&gt;</span></code></pre>
+        <a class="btn ghost" href="app.html">Compose a scene to embed&nbsp;<span aria-hidden="true">→</span></a>
       </div>
     </section>
-  </aside>
+  </main>
 
-  <footer id="hints">
-    <span><kbd>Space</kbd> pause</span>
-    <span><kbd>R</kbd> regenerate</span>
-    <span><kbd>P</kbd> palette</span>
-    <span><kbd>S</kbd> save</span>
-    <span><kbd>H</kbd> hide UI</span>
-    <span><kbd>F</kbd> fullscreen</span>
-    <span><kbd>M</kbd> sound</span>
-    <span><kbd>C</kbd> copy link</span>
-    <span><kbd>G</kbd> auto-cycle</span>
-    <span><kbd>1</kbd>–<kbd>7</kbd> switch</span>
-    <span class="muted">move / drag the pointer to interact</span>
+  <footer class="site-foot">
+    <span class="f-brand">Living Systems</span>
+    <span class="f-mid">Order that no single part intends.</span>
+    <span class="f-copy">© <span id="year">2026</span></span>
   </footer>
 
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-  <script type="module" src="src/main.js"></script>
+  <script type="module" src="landing.js"></script>
 </body>
 </html>
