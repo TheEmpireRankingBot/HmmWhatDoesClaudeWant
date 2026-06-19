@@ -330,12 +330,115 @@ async function shareLink() {
   }
 }
 
-function savePNG() {
+// ---- Export: stills, video, embed -----------------------------------------
+function exportDims(choice) {
+  if (choice === '2x') return { w: Math.round(env.width * 2), h: Math.round(env.height * 2) };
+  if (choice === '4k') return { w: 3840, h: 2160 };
+  if (choice === 'phone') return { w: 1080, h: 1920 };
+  if (choice === 'square') return { w: 2160, h: 2160 };
+  return { w: env.width, h: env.height };
+}
+
+/**
+ * Render the current scene to an offscreen canvas at an arbitrary resolution.
+ * A fresh sketch instance is run for a couple of seconds of frames with the
+ * same seed, params and palette — so it reproduces the look at any size, with
+ * no audio/pointer influence (deterministic).
+ */
+function renderStill(w, h) {
+  const off = document.createElement('canvas');
+  off.width = w;
+  off.height = h;
+  const c2 = off.getContext('2d', { alpha: false });
+  c2.setTransform(1, 0, 0, 1, 0, 0);
+  const tEnv = {
+    width: w, height: h, dpr: 1, seed: env.seed,
+    get palette() { return book.current; },
+    pointer: { x: -1, y: -1, px: -1, py: -1, down: false, inside: false, justPressed: false },
+    audio: { level: 0, beat: false },
+    refreshControls: () => {},
+  };
+  const S = active.constructor;
+  const s = new S(c2, tEnv);
+  Object.assign(s.params, active.params);
+  s.reset();
+  for (let i = 0; i < 200; i++) s.frame(1 / 60); // settle into a mature frame
+  return off;
+}
+
+async function savePNG() {
+  if (!active) return;
+  const name = active.constructor.id;
+  const sel = document.getElementById('export-size');
+  const choice = sel ? sel.value : 'screen';
+  let dataURL;
+  let w = env.width, h = env.height;
+  if (choice === 'screen') {
+    dataURL = canvas.toDataURL('image/png');
+  } else {
+    const d = exportDims(choice);
+    w = d.w; h = d.h;
+    showToast(`Rendering ${w}×${h}…`);
+    // Let the toast paint before the synchronous render blocks the thread.
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    dataURL = renderStill(w, h).toDataURL('image/png');
+  }
+  window.LivingSystems._lastExport = { w, h, bytes: dataURL.length };
   const link = document.createElement('a');
-  const name = active ? active.constructor.id : 'sketch';
-  link.download = `living-systems-${name}-${Date.now()}.png`;
-  link.href = canvas.toDataURL('image/png');
+  link.download = `living-systems-${name}-${w}x${h}-${Date.now()}.png`;
+  link.href = dataURL;
   link.click();
+  showToast('Image saved');
+}
+
+// ---- Video recording (WebM via MediaRecorder) -----------------------------
+let mediaRecorder = null;
+let recChunks = [];
+function toggleRecord() {
+  const btn = document.getElementById('btn-record');
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop();
+    return;
+  }
+  if (!canvas.captureStream || typeof MediaRecorder === 'undefined') {
+    showToast('Recording is not supported in this browser');
+    return;
+  }
+  const stream = canvas.captureStream(60);
+  const types = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+  const mimeType = types.find((t) => MediaRecorder.isTypeSupported(t)) || 'video/webm';
+  recChunks = [];
+  mediaRecorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 12_000_000 });
+  mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size) recChunks.push(e.data); };
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(recChunks, { type: 'video/webm' });
+    window.LivingSystems._lastRecBytes = blob.size;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.download = `living-systems-${active ? active.constructor.id : 'scene'}-${Date.now()}.webm`;
+    a.href = url;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    btn.classList.remove('on');
+    btn.textContent = 'Record';
+    showToast('Clip saved');
+  };
+  mediaRecorder.start();
+  btn.classList.add('on');
+  btn.textContent = 'Stop ●';
+  showToast('Recording… press Stop to save');
+}
+
+// ---- Embed: copy an <iframe> snippet for this scene -----------------------
+function copyEmbed() {
+  syncHash();
+  const src = `${location.origin}${location.pathname}?embed=1${location.hash}`;
+  const snippet =
+    `<iframe src="${src}" style="width:100%;height:100%;border:0" ` +
+    `loading="lazy" allow="autoplay; fullscreen" title="Living Systems"></iframe>`;
+  const done = () => showToast('Embed code copied');
+  if (navigator.clipboard) navigator.clipboard.writeText(snippet).then(done, done);
+  else done();
 }
 
 function toggleFullscreen() {
@@ -405,6 +508,8 @@ document.getElementById('btn-hide').addEventListener('click', toggleUI);
 btnSound.addEventListener('click', toggleSound);
 document.getElementById('btn-sleep').addEventListener('click', sleepMode);
 document.getElementById('btn-cycle').addEventListener('click', toggleAutoCycle);
+document.getElementById('btn-record').addEventListener('click', toggleRecord);
+document.getElementById('btn-embed').addEventListener('click', copyEmbed);
 
 const volInput = document.getElementById('vol');
 const twinkleInput = document.getElementById('twinkle');
@@ -427,6 +532,8 @@ window.addEventListener('keydown', (e) => {
     case 'm': toggleSound(); break;
     case 'c': shareLink(); break;
     case 'g': toggleAutoCycle(); break;
+    case 'v': toggleRecord(); break;
+    case 'e': copyEmbed(); break;
     default: {
       // Number keys 1..N switch pieces.
       const n = parseInt(e.key, 10);
@@ -445,6 +552,8 @@ window.LivingSystems = {
   get palette() { return book.current.name; },
   get audioLevel() { return audio.level; },
   get autoCycle() { return autoCycle; },
+  _lastRecBytes: 0,
+  _lastExport: null,
   share: shareLink,
 };
 
@@ -454,4 +563,11 @@ updatePaletteName();
 resize();
 // Open a shared scene from the URL hash, or fall back to the first piece.
 if (!applyHash()) selectSketch(SKETCHES[0], { fresh: false });
+
+// Embed mode (?embed=1) strips the chrome to a bare live background; ?cycle=1
+// starts the gallery drifting. Both are meant for the iframe embed snippet.
+const boot = new URLSearchParams(location.search);
+if (boot.get('embed') === '1') document.body.classList.add('embed');
+if (boot.get('cycle') === '1') toggleAutoCycle();
+
 requestAnimationFrame(loop);

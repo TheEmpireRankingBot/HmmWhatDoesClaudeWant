@@ -66,7 +66,9 @@ Each piece has its own sliders in the panel. Shared shortcuts:
 | `Space` | pause / play |
 | `R` | regenerate (new random seed) |
 | `P` | cycle colour palette |
-| `S` | save the current frame as a PNG |
+| `S` | save a still image (size set in the Export panel) |
+| `V` | record / stop a WebM video clip |
+| `E` | copy an embed snippet for this scene |
 | `H` | hide the interface (clean view / screenshots) |
 | `F` | fullscreen |
 | `M` | toggle ambient sound |
@@ -78,6 +80,35 @@ Move or drag the pointer to interact with whatever's on screen.
 
 ### Shareable scenes
 Every scene lives in the URL. The active piece, palette, seed and every slider value are encoded in the address-bar hash, so **Copy link** (or `C`) gives you a URL that reopens *exactly* what you're looking at — same flock, same coral, same swirl of ink — because all randomness flows through the seed. Paste a link, or just bookmark a scene you like.
+
+---
+
+## Export &amp; embed
+
+The **Export** panel turns a scene into something you can keep, post or sell.
+
+- **Save image** (`S`) — renders the current scene at a chosen resolution: **screen, 2×, 4K (3840×2160), phone (1080×1920)** or **square (2160²)**. Bigger-than-screen sizes are rendered offscreen at full resolution with the same seed/params/palette, so a 4K wallpaper is genuinely 4K, not an upscale.
+- **Record** (`V`) — captures the live canvas to a **WebM video** via `MediaRecorder`; press again to stop and download. Great for looping animated wallpapers or social clips.
+- **Copy embed code** (`E`) — copies an `<iframe>` snippet that drops this exact scene into any page as a **live background**.
+
+### Embedding
+The embed snippet points at the page with `?embed=1`, which strips all the interface and just runs the canvas:
+
+```html
+<iframe src="https://your-host/?embed=1#s=ink&p=Tide&seed=…"
+        style="width:100%;height:100%;border:0" allow="autoplay; fullscreen"></iframe>
+```
+
+Two URL flags drive embeds:
+
+| Flag | Effect |
+|---|---|
+| `?embed=1` | hide all UI — a bare, full-bleed live background |
+| `?cycle=1` | start in auto-cycle, drifting between pieces and palettes |
+
+Everything after `#` is just a shared-scene link, so you can pin an embed to one exact scene or let it wander. It's all static files, so an embed costs you nothing to host.
+
+There's also a tiny read-only `window.LivingSystems` hook (`sketch`, `palette`, `audioLevel`, `autoCycle`) for scripting or analytics.
 
 There are nine palettes (Aurora, Ember, Bloom, Tide, Flora, Mono, Spectral, Galaxy, Nightfall); every piece reads from the same palette, so a colour scheme carries across the whole gallery.
 

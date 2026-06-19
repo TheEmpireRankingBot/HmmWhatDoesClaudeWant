@@ -41,10 +41,29 @@
       <div class="action-grid">
         <button id="btn-pause" class="action" title="Pause / play (Space)">Pause</button>
         <button id="btn-regen" class="action" title="Regenerate (R)">Regenerate</button>
-        <button id="btn-save" class="action" title="Save PNG (S)">Save PNG</button>
         <button id="btn-fullscreen" class="action" title="Fullscreen (F)">Fullscreen</button>
+        <button id="btn-hide" class="action" title="Hide interface (H)">Hide UI</button>
         <button id="btn-share" class="action wide" title="Copy a link to this exact scene (C)">Copy link</button>
-        <button id="btn-hide" class="action wide" title="Hide interface (H)">Hide UI</button>
+      </div>
+    </section>
+
+    <section class="card export">
+      <h3 class="card-heading">Export &amp; embed</h3>
+      <p class="card-note">Save a wallpaper, record a clip, or drop this scene into any site as a live background.</p>
+      <div class="control">
+        <label>Image size</label>
+        <select id="export-size">
+          <option value="screen">Screen</option>
+          <option value="2x">2× screen</option>
+          <option value="4k" selected>4K — 3840 × 2160</option>
+          <option value="phone">Phone — 1080 × 1920</option>
+          <option value="square">Square — 2160 × 2160</option>
+        </select>
+      </div>
+      <div class="action-grid">
+        <button id="btn-save" class="action" title="Save still image (S)">Save image</button>
+        <button id="btn-record" class="action" title="Record a WebM clip (V)">Record</button>
+        <button id="btn-embed" class="action wide" title="Copy an iframe embed snippet (E)">Copy embed code</button>
       </div>
     </section>
 
