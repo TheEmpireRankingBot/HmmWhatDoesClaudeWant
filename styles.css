@@ -339,6 +339,13 @@ body.ui-hidden #hints {
 }
 #topbar, #panel, #hints { transition: opacity 0.3s ease; }
 
+/* ---- Embed mode (chrome-less live background) ---------------------------- */
+body.embed #topbar,
+body.embed #panel,
+body.embed #hints,
+body.embed #toast { display: none !important; }
+body.embed #stage { cursor: default; }
+
 /* ---- Responsive --------------------------------------------------------- */
 @media (max-width: 760px) {
   #topbar {
