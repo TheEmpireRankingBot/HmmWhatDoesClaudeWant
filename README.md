@@ -1,6 +1,6 @@
 # Living Systems
 
-**A small gallery of emergence — six interactive generative artworks, each built from a handful of simple rules that add up to something that looks alive — with a generative ambient soundtrack so the whole thing doubles as a companion for sleep and focus.**
+**A small gallery of emergence — seven interactive generative artworks, each built from a handful of simple rules that add up to something that looks alive — with a generative ambient soundtrack so the whole thing doubles as a companion for sleep and focus.**
 
 No build step, no dependencies, no backend. Pure HTML + CSS + ES-module JavaScript drawn to a `<canvas>`. Open it and play.
 
@@ -17,7 +17,8 @@ No build step, no dependencies, no backend. Pure HTML + CSS + ES-module JavaScri
 | 3 | **Coral** | feed · kill · diffuse | Turing patterns (shells, spots, coral) |
 | 4 | **Heartwood** | a branch splits into branches | a swaying, blossoming tree |
 | 5 | **Mycelium** | follow and feed a shared trail | a self-organising slime-mould network |
-| 6 | **Cosmos** | drift · parallax · twinkle | a slow fall through stars and nebula |
+| 6 | **Ink** | make the fluid divergence-free, repeat | swirling, eddying clouds of dye |
+| 7 | **Cosmos** | drift · parallax · twinkle | a slow fall through stars and nebula |
 
 ### 1 — Currents
 Thousands of particles ride an invisible vector field defined by **3D simplex noise** (the third axis is time, so the field slowly breathes). Each particle leaves a faint trail; the trails pile up into hair-like currents. The pointer stirs a vortex.
@@ -34,7 +35,10 @@ A recursive, hand-rolled **L-system** garden. A branch splits into smaller branc
 ### 5 — Mycelium
 A colony of *Physarum* slime mould, simulated as thousands of agents that share nothing but a chemical trail painted into the grid beneath them. Each agent sniffs the trail at three points just ahead, steers toward the strongest, steps forward, and drops a little trail of its own; the trail diffuses and fades. From that one **sense → steer → deposit** rule the colony grows the branching, self-optimising transport network a real slime mould uses to connect food — the same behaviour that famously re-drew the Tokyo rail map. A touch of heading noise plus a wide sensor angle keeps it a living 2-D mesh rather than collapsing onto a single loop. Drag to feed it a blob of attractant and the veins reach toward it. Five presets, from fine **Veins** to a turbulent **Frenzy**.
 
-### 6 — Cosmos
+### 6 — Ink
+A genuine fluid, not a fake. This is **Jos Stam's "stable fluids"** scheme for the incompressible Navier–Stokes equations — the method that earned a SIGGRAPH technical Oscar and put smoke and water into films and games. Each frame the velocity field is made **divergence-free** with a Poisson pressure solve (fluid can't pile up), **advected through itself** by tracing backwards in time (the trick that makes it stable at any time step), made divergence-free again, and finally given its swirl back with **vorticity confinement** so eddies don't wash out. A dye field rides along and is what you see. Drag to push the fluid and lay down ink; gentle thermals keep it drifting on its own between touches. Sliders for swirl, force, dye fade, solver quality and resolution, and whether colour follows the dye, the speed, or both.
+
+### 7 — Cosmos
 A slow drift through deep space, made to be stared into. Three layers: a soft **nebula** baked from fractal noise (and blurred by upscaling), a **parallax starfield** where nearer stars drift and twinkle faster and the pointer gently shifts the field by depth, and **shooting stars** that streak across now and then — each one ringing a soft chime through the audio engine. Click to send one across.
 
 ---
@@ -64,9 +68,13 @@ Each piece has its own sliders in the panel. Shared shortcuts:
 | `H` | hide the interface (clean view / screenshots) |
 | `F` | fullscreen |
 | `M` | toggle ambient sound |
-| `1`–`6` | switch between pieces |
+| `C` | copy a shareable link to the exact scene |
+| `1`–`7` | switch between pieces |
 
 Move or drag the pointer to interact with whatever's on screen.
+
+### Shareable scenes
+Every scene lives in the URL. The active piece, palette, seed and every slider value are encoded in the address-bar hash, so **Copy link** (or `C`) gives you a URL that reopens *exactly* what you're looking at — same flock, same coral, same swirl of ink — because all randomness flows through the seed. Paste a link, or just bookmark a scene you like.
 
 There are nine palettes (Aurora, Ember, Bloom, Tide, Flora, Mono, Spectral, Galaxy, Nightfall); every piece reads from the same palette, so a colour scheme carries across the whole gallery.
 
@@ -107,6 +115,7 @@ src/
     coral.js          Gray–Scott reaction–diffusion
     heartwood.js      recursive growing garden
     mycelium.js       Physarum slime-mould network
+    ink.js            Navier–Stokes stable-fluids solver
     cosmos.js         drifting nebula + parallax starfield
 ```
 
@@ -118,6 +127,8 @@ Design notes worth knowing:
 - **Device-pixel-ratio aware.** The canvas backing store scales with the display (capped at 2×) so it stays crisp on retina screens, and saved PNGs are full-resolution.
 - **Performance.** Boids use a spatial hash; the reaction–diffusion and the slime-mould trail field both run on a capped, downscaled grid (thousands of agents over tens of thousands of cells) and are upscaled with smoothing.
 - **Emergence that stays alive.** A *Physarum* colony can collapse onto a single closed loop on a wrap-around grid — one fat band instead of a network. A small per-agent heading jitter plus a wide sensor angle keeps Mycelium a 2-D mesh, and every preset was parameter-swept across screen sizes and seeds (checking row/column mass concentration) to confirm it never collapses.
+- **A real fluid solver.** Ink is Stam's stable-fluids method — a Gauss–Seidel Poisson pressure projection for incompressibility, semi-Lagrangian advection (unconditionally stable), and vorticity confinement to keep eddies crisp — on a square grid stretched to the canvas. The solver was validated headless: across resolutions it stays NaN-free, velocity bounded, and projection drives the velocity divergence to ~1e-3.
+- **Shareable by URL.** The full scene (piece, palette, seed, params) serialises into the location hash via `replaceState`, and is parsed on load and on `hashchange` — so any link round-trips to the identical scene with no backend.
 - **Generative audio.** The soundtrack is synthesised live in the Web Audio graph — detuned oscillator voices through a filter an LFO slowly sweeps, a noise-impulse convolver reverb, and pentatonic chime tones scheduled at random. No audio files; it's all maths, like the visuals. Created lazily on first gesture, as autoplay rules require.
 
 ## License

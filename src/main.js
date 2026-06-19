@@ -12,9 +12,10 @@ import { Murmuration } from './sketches/murmuration.js';
 import { Coral } from './sketches/coral.js';
 import { Heartwood } from './sketches/heartwood.js';
 import { Mycelium } from './sketches/mycelium.js';
+import { Ink } from './sketches/ink.js';
 import { Cosmos } from './sketches/cosmos.js';
 
-const SKETCHES = [Currents, Murmuration, Coral, Heartwood, Mycelium, Cosmos];
+const SKETCHES = [Currents, Murmuration, Coral, Heartwood, Mycelium, Ink, Cosmos];
 
 const canvas = document.getElementById('stage');
 const ctx = canvas.getContext('2d', { alpha: false });
@@ -59,20 +60,26 @@ function resize() {
 }
 
 // ---- Sketch management ----------------------------------------------------
-function selectSketch(SketchClass, { fresh = true } = {}) {
+function selectSketch(SketchClass, { fresh = true, seed = null, params = null } = {}) {
   active = new SketchClass(ctx, env);
-  if (fresh) env.seed = randomSeed();
+  // Restore parameters (e.g. from a shared link) before reset so the sketch
+  // initialises with them.
+  if (params) Object.assign(active.params, params);
+  if (seed != null) env.seed = seed >>> 0;
+  else if (fresh) env.seed = randomSeed();
   ctx.setTransform(env.dpr, 0, 0, env.dpr, 0, 0);
   active.reset();
   buildControls();
   updateInfo(SketchClass);
   highlightTab(SketchClass.id);
+  syncHash();
 }
 
 function regenerate() {
   if (!active) return;
   env.seed = randomSeed();
   active.reset();
+  syncHash();
 }
 
 // ---- Animation loop -------------------------------------------------------
@@ -167,6 +174,7 @@ function buildControls() {
         active.params[c.key] = v;
         readout.textContent = formatNumber(v);
         active.onParam(c.key);
+        syncHash();
       });
       row.appendChild(input);
       controlInputs.set(c.key, { input, readout });
@@ -182,6 +190,7 @@ function buildControls() {
       select.addEventListener('change', () => {
         active.params[c.key] = select.value;
         active.onParam(c.key);
+        syncHash();
       });
       row.appendChild(select);
       controlInputs.set(c.key, { input: select });
@@ -192,6 +201,7 @@ function buildControls() {
       input.addEventListener('change', () => {
         active.params[c.key] = input.checked;
         active.onParam(c.key);
+        syncHash();
       });
       row.appendChild(input);
       controlInputs.set(c.key, { input });
@@ -222,9 +232,83 @@ const paletteNameEl = document.getElementById('palette-name');
 function cyclePalette() {
   book.next();
   paletteNameEl.textContent = book.current.name;
+  syncHash();
 }
 function updatePaletteName() {
   paletteNameEl.textContent = book.current.name;
+}
+
+// ---- Shareable permalinks -------------------------------------------------
+// The whole scene — piece, palette, seed and every parameter — is encoded in
+// the URL hash. Because all randomness flows through the seed, opening a link
+// reproduces the exact scene. The hash is kept in sync via replaceState (no
+// history spam), and parsed on load and on manual hashchange.
+function syncHash() {
+  if (!active) return;
+  const sp = new URLSearchParams();
+  sp.set('s', active.constructor.id);
+  sp.set('p', book.current.name);
+  sp.set('seed', String(env.seed >>> 0));
+  for (const [k, v] of Object.entries(active.params)) sp.set(k, String(v));
+  try {
+    history.replaceState(null, '', '#' + sp.toString());
+  } catch (e) {
+    location.hash = sp.toString();
+  }
+}
+
+function applyHash() {
+  const h = location.hash.replace(/^#/, '');
+  if (!h) return false;
+  const sp = new URLSearchParams(h);
+  const S = SKETCHES.find((x) => x.id === sp.get('s'));
+  if (!S) return false;
+  const palName = sp.get('p');
+  if (palName) {
+    book.setByName(palName);
+    updatePaletteName();
+  }
+  // Coerce each shared param to the type of its default value.
+  const probe = new S(ctx, env);
+  const params = {};
+  for (const c of probe.controls()) {
+    if (!sp.has(c.key)) continue;
+    const raw = sp.get(c.key);
+    const def = probe.params[c.key];
+    if (typeof def === 'number') {
+      const n = parseFloat(raw);
+      if (Number.isFinite(n)) params[c.key] = n;
+    } else if (typeof def === 'boolean') {
+      params[c.key] = raw === 'true';
+    } else {
+      params[c.key] = raw;
+    }
+  }
+  const seedStr = sp.get('seed');
+  const seed = seedStr && /^\d+$/.test(seedStr) ? parseInt(seedStr, 10) >>> 0 : null;
+  selectSketch(S, { fresh: seed == null, seed, params });
+  return true;
+}
+
+let toastTimer = 0;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+async function shareLink() {
+  syncHash();
+  const url = location.origin + location.pathname + location.hash;
+  try {
+    await navigator.clipboard.writeText(url);
+    showToast('Link copied — it reopens this exact scene');
+  } catch (e) {
+    showToast('Link is in the address bar');
+  }
 }
 
 function savePNG() {
@@ -288,6 +372,7 @@ document.getElementById('btn-regen').addEventListener('click', regenerate);
 document.getElementById('btn-palette').addEventListener('click', cyclePalette);
 document.getElementById('btn-save').addEventListener('click', savePNG);
 document.getElementById('btn-fullscreen').addEventListener('click', toggleFullscreen);
+document.getElementById('btn-share').addEventListener('click', shareLink);
 document.getElementById('btn-hide').addEventListener('click', toggleUI);
 btnSound.addEventListener('click', toggleSound);
 document.getElementById('btn-sleep').addEventListener('click', sleepMode);
@@ -311,20 +396,23 @@ window.addEventListener('keydown', (e) => {
     case 'h': toggleUI(); break;
     case 'f': toggleFullscreen(); break;
     case 'm': toggleSound(); break;
-    case '1': selectSketch(SKETCHES[0]); break;
-    case '2': selectSketch(SKETCHES[1]); break;
-    case '3': selectSketch(SKETCHES[2]); break;
-    case '4': selectSketch(SKETCHES[3]); break;
-    case '5': selectSketch(SKETCHES[4]); break;
-    case '6': selectSketch(SKETCHES[5]); break;
+    case 'c': shareLink(); break;
+    default: {
+      // Number keys 1..N switch pieces.
+      const n = parseInt(e.key, 10);
+      if (n >= 1 && n <= SKETCHES.length) selectSketch(SKETCHES[n - 1]);
+    }
   }
 });
 
 window.addEventListener('resize', resize);
+// Restore a scene when the hash is changed by hand or by navigation.
+window.addEventListener('hashchange', applyHash);
 
 // ---- Boot -----------------------------------------------------------------
 buildTabs();
 updatePaletteName();
 resize();
-selectSketch(SKETCHES[0], { fresh: false });
+// Open a shared scene from the URL hash, or fall back to the first piece.
+if (!applyHash()) selectSketch(SKETCHES[0], { fresh: false });
 requestAnimationFrame(loop);

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Living Systems — a gallery of emergence</title>
-  <meta name="description" content="Six interactive generative artworks built from simple rules: a flow field, a flock, reaction–diffusion, a recursive garden, a slime-mould network, and a starfield — with a generative ambient soundtrack." />
+  <meta name="description" content="Seven interactive generative artworks built from simple rules: a flow field, a flock, reaction–diffusion, a recursive garden, a slime-mould network, a fluid sim, and a starfield — with a generative ambient soundtrack." />
   <meta name="color-scheme" content="dark" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%232ec4b6' stroke-width='6'/><circle cx='50' cy='50' r='10' fill='%23e9ff70'/></svg>" />
   <link rel="stylesheet" href="styles.css" />
@@ -43,6 +43,7 @@
         <button id="btn-regen" class="action" title="Regenerate (R)">Regenerate</button>
         <button id="btn-save" class="action" title="Save PNG (S)">Save PNG</button>
         <button id="btn-fullscreen" class="action" title="Fullscreen (F)">Fullscreen</button>
+        <button id="btn-share" class="action wide" title="Copy a link to this exact scene (C)">Copy link</button>
         <button id="btn-hide" class="action wide" title="Hide interface (H)">Hide UI</button>
       </div>
     </section>
@@ -73,9 +74,11 @@
     <span><kbd>H</kbd> hide UI</span>
     <span><kbd>F</kbd> fullscreen</span>
     <span><kbd>M</kbd> sound</span>
-    <span><kbd>1</kbd>–<kbd>6</kbd> switch</span>
+    <span><kbd>1</kbd>–<kbd>7</kbd> switch</span>
     <span class="muted">move / drag the pointer to interact</span>
   </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script type="module" src="src/main.js"></script>
 </body>
