@@ -25,6 +25,12 @@ export class AudioEngine {
     this.twinkle = 0.5;        // 0..1 → density of automatic ambient bells
     this._nextTwinkle = 0;     // scheduled (ctx) time of next auto bell
     this.voices = [];
+    // Audio-reactive signal, read by sketches via env.audio. `level` is a
+    // smoothed 0..1 amplitude; `beat` pulses true on a transient (a chime).
+    this.level = 0;
+    this.beat = false;
+    this._levelAvg = 0;
+    this._lastBeat = 0;
     this.available =
       typeof window !== 'undefined' &&
       !!(window.AudioContext || window.webkitAudioContext);
@@ -53,6 +59,13 @@ export class AudioEngine {
 
     this.master.connect(limiter);
     limiter.connect(ctx.destination);
+
+    // An analyser taps the final mix so the visuals can react to the sound.
+    this.analyser = ctx.createAnalyser();
+    this.analyser.fftSize = 1024;
+    this.analyser.smoothingTimeConstant = 0.75;
+    limiter.connect(this.analyser);
+    this._wave = new Uint8Array(this.analyser.fftSize);
 
     // A long, soft reverb gives the whole thing a sense of space.
     const reverb = ctx.createConvolver();
@@ -226,8 +239,37 @@ export class AudioEngine {
     osc.onended = cleanup;
   }
 
-  /** Called every frame by the shell; schedules the automatic ambient bells. */
-  update() {
+  /**
+   * Called every frame by the shell. Updates the reactive level/beat signal
+   * and schedules the automatic ambient bells.
+   */
+  update(dt) {
+    // --- Reactive level: smoothed RMS amplitude from the analyser ----------
+    if (this.enabled && this.ctx && this.analyser) {
+      this.analyser.getByteTimeDomainData(this._wave);
+      let sum = 0;
+      const w = this._wave;
+      for (let i = 0; i < w.length; i++) {
+        const x = (w[i] - 128) / 128;
+        sum += x * x;
+      }
+      const raw = clamp(Math.sqrt(sum / w.length) * 3.2, 0, 1);
+      // Fast attack, slow release, so the signal feels musical.
+      this.level += (raw - this.level) * (raw > this.level ? 0.6 : 0.08);
+      this._levelAvg += (this.level - this._levelAvg) * 0.04;
+      const t = this.ctx.currentTime;
+      this.beat = false;
+      if (this.level > this._levelAvg * 1.3 + 0.015 && t - this._lastBeat > 0.16) {
+        this.beat = true;
+        this._lastBeat = t;
+      }
+    } else {
+      // Decay to silence when disabled so visuals settle back.
+      this.level += (0 - this.level) * Math.min(1, (dt || 0.016) * 5);
+      if (this.level < 0.001) this.level = 0;
+      this.beat = false;
+    }
+
     if (!this.enabled || !this.ctx) return;
     const now = this.ctx.currentTime;
     if (now >= this._nextTwinkle) {

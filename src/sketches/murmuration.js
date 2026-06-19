@@ -88,7 +88,9 @@ export class Murmuration extends Sketch {
     const wSep = P.separation;
     const wAli = P.alignment;
     const wCoh = P.cohesion;
-    const maxSpeed = P.maxSpeed;
+    // Audio-reactive: the flock surges a little on louder passages.
+    const level = env.audio?.level || 0;
+    const maxSpeed = P.maxSpeed * (1 + level * 0.5);
     const maxForce = 0.06 * maxSpeed;
     // Frame-rate compensation so motion is consistent regardless of fps.
     const tStep = clamp(dt * 60, 0.5, 2);

@@ -173,6 +173,8 @@ export class Mycelium extends Sketch {
       this.feed(cx, cy, 5, 0.9);
     }
 
+    // Audio-reactive: agents crawl a little faster on louder passages.
+    this._speedMul = 1 + (env.audio?.level || 0) * 0.7;
     for (let s = 0; s < ITERATIONS; s++) this.step();
     this.draw();
   }
@@ -181,7 +183,7 @@ export class Mycelium extends Sketch {
     const { gw, gh, trail, trail2, px, py, ph, count } = this;
     const P = this.params;
     const SA = P.sensorAngle, SD = P.sensorDist, TR = P.turn, DC = P.persist;
-    const JT = this.jitter, SS = this.stepLen;
+    const JT = this.jitter, SS = this.stepLen * (this._speedMul || 1);
     const rng = Math.random;
 
     // --- Agents: sense ahead, steer toward the strongest trail, move, drop ---

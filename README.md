@@ -47,9 +47,11 @@ A slow drift through deep space, made to be stared into. Three layers: a soft **
 
 The honest reason the gallery exists is to be *looked at* — so it ships with a generative soundtrack that makes it something to **fall asleep to, or focus against**.
 
-Open the **Ambience** panel and hit **Sound** (or press `M`). You'll hear a slow, low **drone pad** breathing under a long reverb, with soft **chimes** drifting in at random — a pentatonic scale, so nothing ever clashes. It never loops and never resolves; it just keeps going. Some sketches add accents (a shooting star in Cosmos rings a chime). Two sliders shape it: **Volume** and **Chimes** (how often the bells fall).
+Open the **Ambience** panel and hit **Sound** (or press `M`). You'll hear a slow, low **drone pad** breathing under a long reverb, with soft **chimes** drifting in at random — a pentatonic scale, so nothing ever clashes. It never loops and never resolves; it just keeps going. Two sliders shape it: **Volume** and **Chimes** (how often the bells fall).
 
-For the full effect, press **Sleep mode**: it drops you into Cosmos with a calm palette, starts the audio softly, hides the interface and goes fullscreen — a dark, drifting, gently-chiming starfield with nothing else on screen. Leave it running by the bed, or on a second monitor while you work.
+**The visuals listen back.** With sound on, every piece reacts to it: the flock surges on swells, the fluid pulses and a chime kicks a swirl into it, the coral throws out fresh growth, the trees sway harder, and the stars brighten — a loud chime can even fling a shooting star across Cosmos. An analyser taps the live mix, so the gallery breathes with its own soundtrack. (Muted, everything behaves exactly as before.)
+
+For the full effect, press **Sleep mode**: it drops you into Cosmos with a calm palette, starts the audio softly, hides the interface and goes fullscreen — a dark, drifting, gently-chiming starfield with nothing else on screen. Or hit **Auto-cycle** (`G`) to turn the whole gallery into a slow screensaver that drifts from piece to piece and palette to palette on its own. Leave either running by the bed, or on a second monitor while you work.
 
 > Audio only starts on a click/tap/keypress — browsers require a gesture before they'll make sound — so the **Sound** and **Sleep mode** buttons are how you begin.
 
@@ -69,6 +71,7 @@ Each piece has its own sliders in the panel. Shared shortcuts:
 | `F` | fullscreen |
 | `M` | toggle ambient sound |
 | `C` | copy a shareable link to the exact scene |
+| `G` | auto-cycle (gallery / screensaver mode) |
 | `1`–`7` | switch between pieces |
 
 Move or drag the pointer to interact with whatever's on screen.
@@ -129,6 +132,7 @@ Design notes worth knowing:
 - **Emergence that stays alive.** A *Physarum* colony can collapse onto a single closed loop on a wrap-around grid — one fat band instead of a network. A small per-agent heading jitter plus a wide sensor angle keeps Mycelium a 2-D mesh, and every preset was parameter-swept across screen sizes and seeds (checking row/column mass concentration) to confirm it never collapses.
 - **A real fluid solver.** Ink is Stam's stable-fluids method — a Gauss–Seidel Poisson pressure projection for incompressibility, semi-Lagrangian advection (unconditionally stable), and vorticity confinement to keep eddies crisp — on a square grid stretched to the canvas. The solver was validated headless: across resolutions it stays NaN-free, velocity bounded, and projection drives the velocity divergence to ~1e-3.
 - **Shareable by URL.** The full scene (piece, palette, seed, params) serialises into the location hash via `replaceState`, and is parsed on load and on `hashchange` — so any link round-trips to the identical scene with no backend.
+- **Audio-reactive visuals.** An `AnalyserNode` taps the final audio mix; the engine exposes a smoothed RMS `level` (fast attack, slow release) and a `beat` transient flag, and each sketch reads them to modulate its motion. With sound off the level decays to zero, so muted rendering is byte-for-byte unchanged.
 - **Generative audio.** The soundtrack is synthesised live in the Web Audio graph — detuned oscillator voices through a filter an LFO slowly sweeps, a noise-impulse convolver reverb, and pentatonic chime tones scheduled at random. No audio files; it's all maths, like the visuals. Created lazily on first gesture, as autoplay rules require.
 
 ## License

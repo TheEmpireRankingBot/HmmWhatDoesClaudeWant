@@ -154,6 +154,7 @@ export class Cosmos extends Sketch {
     const { width, height, palette, pointer } = env;
     const P = this.params;
     this.time += dt;
+    const level = env.audio?.level || 0; // audio-reactive (0 when silent)
 
     if (env.palette.name !== this._lastPalette) {
       this.recolorNebula();
@@ -202,7 +203,7 @@ export class Cosmos extends Sketch {
       const py = s.y + (pcy * s.z * P.parallax * 0.06);
 
       const tw = 0.55 + 0.45 * Math.sin(this.time * s.tw + s.phase);
-      const alpha = clamp(0.35 + tw * (0.4 + P.twinkle * 0.6), 0, 1);
+      const alpha = clamp(0.35 + tw * (0.4 + P.twinkle * 0.6) + level * 0.35, 0, 1);
       const c = palette.colorAt(s.hue);
       // Stars are mostly starlight-white, lightly tinted by the palette.
       const r = lerp(255, c.r, 0.45);
@@ -237,6 +238,9 @@ export class Cosmos extends Sketch {
       });
       this.env.audio?.ping({ pitch: 0.8, gain: 0.1, decay: 3 });
     }
+    // A loud chime can fling a shooting star across.
+    if (env.audio?.beat && Math.random() < 0.3) this.spawnMeteor();
+
     // Random spawns, rate set by the meteors slider.
     this.meteorTimer -= dt;
     if (this.meteorTimer <= 0) {

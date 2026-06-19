@@ -259,6 +259,17 @@ export class Ink extends Sketch {
       }
     }
 
+    // --- Audio-reactive: each chime kicks a swirl into the fluid -----------
+    const level = env.audio?.level || 0;
+    if (env.audio?.beat) {
+      const a = Math.random() * TAU;
+      const mag = (7 + level * 16);
+      this.splat(
+        2 + (Math.random() * (N - 3) | 0), 2 + (Math.random() * (N - 3) | 0),
+        Math.cos(a) * mag, Math.sin(a) * mag, 0.9, Math.max(4, N / 22)
+      );
+    }
+
     // --- Gentle automatic thermals so it stays alive unattended ------------
     this.autoTimer -= dt;
     if (this.autoTimer <= 0) {
@@ -280,7 +291,8 @@ export class Ink extends Sketch {
     this.advect(1, this.u, this.u0, this.u0, this.v0, dt);
     this.advect(2, this.v, this.v0, this.u0, this.v0, dt);
     this.project(this.u, this.v, this.p, this.div, iters);
-    if (P.swirl > 0) this.vorticity(P.swirl, dt);
+    const swirl = P.swirl * (1 + level * 0.6);
+    if (swirl > 0) this.vorticity(swirl, dt);
     this.dye0.set(this.dye);
     this.advect(0, this.dye, this.dye0, this.u, this.v, dt);
 

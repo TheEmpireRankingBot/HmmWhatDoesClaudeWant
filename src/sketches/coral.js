@@ -127,6 +127,13 @@ export class Coral extends Sketch {
       this.paint(cx, cy, 4);
     }
 
+    // Audio-reactive: each chime seeds a little fresh growth.
+    if (env.audio?.beat) {
+      for (let k = 0; k < 2; k++) {
+        this.paint(Math.floor(Math.random() * gw), Math.floor(Math.random() * gh), 2.5);
+      }
+    }
+
     const iters = P.speed | 0;
     for (let i = 0; i < iters; i++) this.step(P);
 
